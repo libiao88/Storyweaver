@@ -1,0 +1,27 @@
+name = "storyweaver-backend"
+main = "src/index.ts"
+compatibility_date = "2025-07-18"
+workers_dev = true
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+JWT_SECRET = "your-jwt-secret-key"
+OPENAI_API_KEY = "your-openai-api-key"
+CLAUDE_API_KEY = "your-claude-api-key"
+SUPABASE_URL = "https://your-supabase-project.supabase.co"
+SUPABASE_KEY = "your-supabase-anon-key"
+
+[[kv_namespaces]]
+binding = "STORYWEAVER_KV"
+id = "your-kv-namespace-id"
+
+[[r2_buckets]]
+binding = "STORYWEAVER_R2"
+bucket_name = "storyweaver-files"
+
+
+
+[triggers]
+crons = [
+  "0 0 * * *"
+]

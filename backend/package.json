@@ -1,0 +1,26 @@
+{
+  "name": "storyweaver-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts --port 8888",
+    "build": "wrangler build",
+    "deploy": "wrangler deploy src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.cache"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
+    "bcryptjs": "^2.4.0",
+    "hono": "^4.0.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.0.0",
+    "wrangler": "^4.65.0"
+  }
+}
