@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import type { UserConfig, UpdateConfigInput } from '../types/index';
 
-const supabase = createClient(
-  'https://your-supabase-project.supabase.co',
-  'your-supabase-anon-key'
-);
+const getSupabaseClient = () => {
+  return createClient(
+    'https://dqmwpihbwggsjwmpktmo.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxbXdwaWhid2dnc2p3bXBrdG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODg1MzAsImV4cCI6MjA4MzM2NDUzMH0.Xv6yLeJym9EaorbRfnrZ2d8uC7kkN57aacFJvy9O9jA'
+  );
+};
 
 export const configRepository = {
   async findByUserId(userId: string): Promise<UserConfig | null> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_configs')
       .select('*')
@@ -19,6 +22,7 @@ export const configRepository = {
   },
 
   async create(userId: string): Promise<UserConfig> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_configs')
       .insert({
@@ -39,6 +43,7 @@ export const configRepository = {
   },
 
   async update(userId: string, updates: UpdateConfigInput): Promise<UserConfig | null> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_configs')
       .update({

@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Document } from '../types/index';
 
-const supabase = createClient(
-  'https://your-supabase-project.supabase.co',
-  'your-supabase-anon-key'
-);
+const getSupabaseClient = () => {
+  return createClient(
+    'https://dqmwpihbwggsjwmpktmo.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxbXdwaWhid2dnc2p3bXBrdG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODg1MzAsImV4cCI6MjA4MzM2NDUzMH0.Xv6yLeJym9EaorbRfnrZ2d8uC7kkN57aacFJvy9O9jA'
+  );
+};
 
 export const documentRepository = {
   async findAllByUserId(userId: string): Promise<Document[]> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('documents')
       .select('*')
@@ -19,6 +22,7 @@ export const documentRepository = {
   },
 
   async findById(id: string, userId: string): Promise<Document | null> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('documents')
       .select('*')
@@ -30,7 +34,17 @@ export const documentRepository = {
     return data as Document | null;
   },
 
-  async create(input: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>): Promise<Document> {
+  async create(input: {
+    userId: string;
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+    storagePath: string;
+    parsedContent: string;
+    status: string;
+    parsedAt: Date | null;
+  }): Promise<Document> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('documents')
       .insert({
@@ -50,30 +64,14 @@ export const documentRepository = {
     return data as Document;
   },
 
-  async updateStatus(id: string, userId: string, status: string): Promise<Document | null> {
+  async updateParsedContent(id: string, userId: string, content: string): Promise<Document | null> {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('documents')
       .update({
-        status,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .eq('user_id', userId)
-      .select('*')
-      .single();
-
-    if (error) throw error;
-    return data as Document | null;
-  },
-
-  async updateParsedContent(id: string, userId: string, parsedContent: string): Promise<Document | null> {
-    const { data, error } = await supabase
-      .from('documents')
-      .update({
-        parsed_content: parsedContent,
+        parsed_content: content,
         status: 'parsed',
         parsed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
       .eq('user_id', userId)
@@ -85,6 +83,7 @@ export const documentRepository = {
   },
 
   async delete(id: string, userId: string): Promise<boolean> {
+    const supabase = getSupabaseClient();
     const { error } = await supabase
       .from('documents')
       .delete()

@@ -11,7 +11,7 @@ export const storyService = {
   },
 
   async createStory(input: CreateStoryInput): Promise<Story> {
-    if (!input.title || !input.description || !input.role || !input.action || !input.value) {
+    if (!input.title || !input.module) {
       throw new Error('Missing required fields');
     }
 

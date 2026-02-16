@@ -12,3 +12,5 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 [[kv_namespaces]]
 binding = "STORYWEAVER_KV"
 id = "25a1eb2c26e645b59f1eab2e33dcdb5c"
+
+# R2 已移除，使用 Supabase Storage 代替

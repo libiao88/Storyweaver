@@ -33,6 +33,7 @@ export const authMiddleware = async (c: Context<{ Bindings: Env }>, next: Next) 
     const decoded = verify(token, jwtSecret) as unknown as JwtPayload;
     c.set('user', {
       id: decoded.userId,
+      userId: decoded.userId,
       email: decoded.email,
       name: decoded.name,
       role: decoded.role,
