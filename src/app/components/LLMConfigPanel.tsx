@@ -261,6 +261,8 @@ export function LLMConfigPanel({
                 <ul className="ml-4 mt-1 space-y-1">
                   <li>• 国外模型可能需要网络代理</li>
                   <li>• 国内模型通常可直接访问</li>
+                  <li>• <strong style={{color: '#dc2626'}}>注意：浏览器直接调用 API 可能遇到 CORS 跨域限制</strong></li>
+                  <li>• 如遇连接失败，建议使用代理服务器或后端中转</li>
                 </ul>
               </li>
             </ul>

@@ -66,20 +66,18 @@ export default function App() {
       setIsTesting(false);
       console.error('LLM connection test failed:', error);
       
+      // 错误信息已经在 LLMOptimizer 中格式化，直接传递
       if (error.message?.includes('API_KEY_MISSING')) {
         throw new Error('API Key 不能为空');
-      } else if (error.message?.includes('TIMEOUT')) {
-        throw new Error('连接超时，请检查网络或API地址');
-      } else if (error.message?.includes('RATE_LIMIT')) {
-        throw new Error('请求过于频繁，请稍后再试');
-      } else if (error.message?.includes('QUOTA_EXCEEDED')) {
-        throw new Error('API 配额已用完，请检查账户余额');
-      } else if (error.message?.includes('API_CALL_FAILED')) {
-        throw new Error('API 调用失败，请检查 API Key 是否正确');
-      } else if (error.message?.includes('fetch') || error.message?.includes('network')) {
-        throw new Error('网络错误，请检查网络连接或代理设置');
+      } else if (error.message?.includes('LLM_003')) {
+        throw new Error('连接超时，请检查网络或 API 地址');
+      } else if (error.message?.includes('LLM_004')) {
+        throw new Error('API 响应无效');
+      } else if (error.message?.includes('fetch') || error.message?.includes('Failed to fetch')) {
+        throw new Error('网络错误：无法连接到 API 服务器。如果是浏览器环境，可能是 CORS 跨域限制，请使用代理服务器或后端中转');
       } else {
-        throw new Error(`连接失败: ${error.message || '未知错误'}`);
+        // 直接传递已格式化的错误信息
+        throw error;
       }
     }
   };
