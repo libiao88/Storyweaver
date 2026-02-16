@@ -137,7 +137,7 @@ export class StoryGenerator {
     if (factors.valueClarity < 0.5) reasons.push('缺少明确的商业价值');
     
     return {
-      overall: Math.min(overall, 1.0),
+      overall,
       level,
       factors,
       reasons,
@@ -240,7 +240,8 @@ export class StoryGenerator {
       isEdited: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      sortOrder: 0
+      sortOrder: 0,
+      dependencies: [], // 新增字段
     };
 
     // LLM优化
