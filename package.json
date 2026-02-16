@@ -74,10 +74,12 @@
     "vaul": "1.1.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "4.1.12",
     "@types/react-dom": "^19.2.3",
     "@types/recharts": "^1.8.29",
     "@vitejs/plugin-react": "4.7.0",
+    "playwright": "^1.58.2",
     "tailwindcss": "4.1.12",
     "typescript": "^5.9.3",
     "vite": "6.3.5"
@@ -98,5 +100,18 @@
     "overrides": {
       "vite": "6.3.5"
     }
-  }
+  },
+  "description": "This is a code bundle for StoryWeaver AI. The original project is available at https://www.figma.com/design/tfg13w6GKspCCUFr47BkY3/%E9%9C%80%E6%B1%82%E6%8B%86%E8%A7%A3%E5%B9%B3%E5%8F%B0.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libiao88/Storyweaver.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/libiao88/Storyweaver/issues"
+  },
+  "homepage": "https://github.com/libiao88/Storyweaver#readme"
 }

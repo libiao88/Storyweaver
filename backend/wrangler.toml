@@ -5,23 +5,10 @@ workers_dev = true
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-JWT_SECRET = "your-jwt-secret-key"
-OPENAI_API_KEY = "your-openai-api-key"
-CLAUDE_API_KEY = "your-claude-api-key"
-SUPABASE_URL = "https://your-supabase-project.supabase.co"
-SUPABASE_KEY = "your-supabase-anon-key"
+JWT_SECRET = "storyweaver-jwt-secret-key-2024-secure"
+SUPABASE_URL = "https://dqmwpihbwggsjwmpktmo.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxbXdwaWhid2dnc2p3bXBrdG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3ODg1MzAsImV4cCI6MjA4MzM2NDUzMH0.Xv6yLeJym9EaorbRfnrZ2d8uC7kkN57aacFJvy9O9jA"
 
 [[kv_namespaces]]
 binding = "STORYWEAVER_KV"
-id = "your-kv-namespace-id"
-
-[[r2_buckets]]
-binding = "STORYWEAVER_R2"
-bucket_name = "storyweaver-files"
-
-
-
-[triggers]
-crons = [
-  "0 0 * * *"
-]
+id = "25a1eb2c26e645b59f1eab2e33dcdb5c"
