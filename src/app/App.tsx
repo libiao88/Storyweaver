@@ -11,17 +11,8 @@ import { Sparkles, FileText, BarChart3, Upload, Map, Search, Code2, Settings } f
 import { Toaster } from '@/app/components/ui/sonner';
 
 import { Priority, StoryStatus } from '@/types/storyweaver';
+import { Story } from '@/types/storyweaver';
 import { LLMConfig, LLMModel } from '@/services/LLMService';
-
-interface Story {
-  id: string;
-  title: string;
-  description: string;
-  module: string;
-  priority: '高' | '中' | '低';
-  sourceReference: string;
-  confidence: number;
-}
 
 export default function App() {
   const [stories, setStories] = useState<Story[]>([]);
@@ -103,9 +94,9 @@ export default function App() {
 
   const stats = {
     total: stories.length,
-    highPriority: stories.filter(s => s.priority === '高').length,
+    highPriority: stories.filter(s => s.priority === Priority.P0).length,
     avgConfidence: stories.length > 0 
-      ? (stories.reduce((sum, s) => sum + s.confidence, 0) / stories.length * 100).toFixed(0)
+      ? (stories.reduce((sum, s) => sum + s.confidence.overall, 0) / stories.length * 100).toFixed(0)
       : 0
   };
 
@@ -269,10 +260,10 @@ export default function App() {
               <Card className="p-6">
                 <div className="text-sm text-gray-600 mb-1">中优先级</div>
                 <div className="text-3xl font-bold text-yellow-600">
-                  {stories.filter(s => s.priority === '中').length}
+                  {stories.filter(s => s.priority === Priority.P1).length}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  占比 {stats.total > 0 ? ((stories.filter(s => s.priority === '中').length / stats.total) * 100).toFixed(0) : 0}%
+                  占比 {stats.total > 0 ? ((stories.filter(s => s.priority === Priority.P1).length / stats.total) * 100).toFixed(0) : 0}%
                 </div>
               </Card>
               
@@ -318,19 +309,19 @@ export default function App() {
                     <div className="flex justify-between text-sm">
                       <span>高置信度 (≥90%)</span>
                       <span className="font-medium text-green-600">
-                        {stories.filter(s => s.confidence >= 0.9).length} 个
+                        {stories.filter(s => s.confidence.overall >= 0.9).length} 个
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>中等置信度 (80-90%)</span>
                       <span className="font-medium text-yellow-600">
-                        {stories.filter(s => s.confidence >= 0.8 && s.confidence < 0.9).length} 个
+                        {stories.filter(s => s.confidence.overall >= 0.8 && s.confidence.overall < 0.9).length} 个
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>需人工审核 (&lt;80%)</span>
                       <span className="font-medium text-orange-600">
-                        {stories.filter(s => s.confidence < 0.8).length} 个
+                        {stories.filter(s => s.confidence.overall < 0.8).length} 个
                       </span>
                     </div>
                   </div>
