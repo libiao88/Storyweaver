@@ -108,7 +108,7 @@ export function StoryMap({ stories: initialStories }: StoryMapProps) {
     }))
   );
 
-  const [teamVelocity, setTeamVelocity] = useState(20);
+  const [teamVelocity, setTeamVelocity] = useState(10);
   const [autoAssigned, setAutoAssigned] = useState(false);
 
   const sensors = useSensors(
@@ -244,8 +244,11 @@ export function StoryMap({ stories: initialStories }: StoryMapProps) {
               id="velocity"
               type="number"
               value={teamVelocity}
-              onChange={(e) => setTeamVelocity(parseInt(e.target.value) || 20)}
-              min="1"
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                setTeamVelocity(isNaN(val) ? 0 : val);
+              }}
+              min="0"
               max="100"
               className="mt-2"
             />
