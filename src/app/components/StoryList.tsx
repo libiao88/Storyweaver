@@ -1,25 +1,18 @@
 import { useState } from 'react';
-import { StoryCard } from '@/app/components/StoryCard';
 import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
-import { Download, Plus, FileText, Copy, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/components/ui/dialog';
-import { Textarea } from '@/app/components/ui/textarea';
+import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { Textarea } from '@/app/components/ui/textarea';
+import { Plus, Copy, Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Priority, StoryStatus } from '@/types/storyweaver';
+import { Priority, StoryStatus, generateUUID } from '@/types/storyweaver';
 
-interface Story {
-  id: string;
-  title: string;
-  description: string;
-  module: string;
-  priority: '高' | '中' | '低';
-  sourceReference: string;
-  confidence: number;
-}
+import { StoryCard } from './StoryCard';
+
+import { Story } from '@/types/storyweaver';
 
 interface StoryListProps {
   stories: Story[];
@@ -33,13 +26,41 @@ export function StoryList({ stories, onUpdateStory, onDeleteStory, onAddStory }:
   const [sortBy, setSortBy] = useState<string>('confidence');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newStory, setNewStory] = useState({
+  const [newStory, setNewStory] = useState<Omit<Story, 'id'>>({
     title: '',
     description: '',
     module: '',
-    priority: '中',
-    sourceReference: '',
-    confidence: 1.0
+    priority: Priority.P1,
+    sourceReference: {
+      text: '',
+      sectionId: '',
+      sectionTitle: '',
+    },
+    confidence: {
+      overall: 0.8,
+      level: 'medium' as any,
+      factors: {
+        templateMatch: 0.8,
+        roleClarity: 0.7,
+        actionClarity: 0.8,
+        valueClarity: 0.7,
+        sourceLength: 0.6,
+        languageClarity: 0.8,
+      },
+      reasons: [],
+      needsReview: false,
+    },
+    storyPoints: 0,
+    dependencies: [], // 新增字段
+    documentId: '',
+    role: '',
+    action: '',
+    value: '',
+    status: StoryStatus.DRAFT,
+    isEdited: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    sortOrder: 0,
   });
 
   const modules = ['all', ...Array.from(new Set(stories.map(s => s.module)))];
@@ -54,9 +75,9 @@ export function StoryList({ stories, onUpdateStory, onDeleteStory, onAddStory }:
     .sort((a, b) => {
       switch (sortBy) {
         case 'confidence':
-          return b.confidence - a.confidence;
+          return b.confidence.overall - a.confidence.overall;
         case 'priority':
-          const priorityOrder: { [key: string]: number } = { '高': 3, '中': 2, '低': 1 };
+          const priorityOrder: { [key: string]: number } = { 'P0': 4, 'P1': 3, 'P2': 2, 'P3': 1 };
           return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
         case 'module':
           return a.module.localeCompare(b.module);
@@ -72,8 +93,8 @@ export function StoryList({ stories, onUpdateStory, onDeleteStory, onAddStory }:
       story.description,
       story.module,
       story.priority,
-      story.sourceReference,
-      story.confidence.toString()
+      story.sourceReference.text,
+      story.confidence.overall.toString()
     ]);
 
     const csvContent = [
@@ -95,13 +116,13 @@ export function StoryList({ stories, onUpdateStory, onDeleteStory, onAddStory }:
 
 **模块**: ${story.module}  
 **优先级**: ${story.priority}  
-**置信度**: ${(story.confidence * 100).toFixed(0)}%
+**置信度**: ${(story.confidence.overall * 100).toFixed(0)}%
 
 ### 用户故事
 ${story.description}
 
 ### 原文引用
-> ${story.sourceReference}
+> ${story.sourceReference.text}
 
 ---
 `).join('\n');
@@ -111,22 +132,43 @@ ${story.description}
   };
 
   const handleAddStory = () => {
-    if (!newStory.title || !newStory.description) {
-      toast.error('请填写标题和描述！');
-      return;
-    }
-
-    onAddStory(newStory);
+    setIsAddDialogOpen(true);
     setNewStory({
       title: '',
       description: '',
       module: '',
-      priority: '中',
-      sourceReference: '',
-      confidence: 1.0
+      priority: Priority.P1,
+      sourceReference: {
+        text: '',
+        sectionId: '',
+        sectionTitle: '',
+      },
+      confidence: {
+        overall: 0.8,
+        level: 'medium' as any,
+        factors: {
+          templateMatch: 0.8,
+          roleClarity: 0.7,
+          actionClarity: 0.8,
+          valueClarity: 0.7,
+          sourceLength: 0.6,
+          languageClarity: 0.8,
+        },
+        reasons: [],
+        needsReview: false,
+      },
+      storyPoints: 0,
+      dependencies: [], // 新增字段
+      documentId: '',
+      role: '',
+      action: '',
+      value: '',
+      status: StoryStatus.DRAFT,
+      isEdited: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      sortOrder: 0,
     });
-    setIsAddDialogOpen(false);
-    toast.success('用户故事已添加！');
   };
 
   return (
@@ -183,15 +225,16 @@ ${story.description}
                     <Label htmlFor="new-priority">优先级</Label>
                     <Select
                       value={newStory.priority}
-                      onValueChange={(value) => setNewStory({ ...newStory, priority: value })}
+                      onValueChange={(value) => setNewStory({ ...newStory, priority: value as Priority })}
                     >
                       <SelectTrigger id="new-priority">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="高">高</SelectItem>
-                        <SelectItem value="中">中</SelectItem>
-                        <SelectItem value="低">低</SelectItem>
+                        <SelectItem value="P0">P0</SelectItem>
+                        <SelectItem value="P1">P1</SelectItem>
+                        <SelectItem value="P2">P2</SelectItem>
+                        <SelectItem value="P3">P3</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -200,8 +243,8 @@ ${story.description}
                   <Label htmlFor="new-source">原文引用</Label>
                   <Textarea
                     id="new-source"
-                    value={newStory.sourceReference}
-                    onChange={(e) => setNewStory({ ...newStory, sourceReference: e.target.value })}
+                    value={newStory.sourceReference.text}
+                    onChange={(e) => setNewStory({ ...newStory, sourceReference: { ...newStory.sourceReference, text: e.target.value } })}
                     placeholder="需求文档中的原文片段..."
                   />
                 </div>

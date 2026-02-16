@@ -13,9 +13,22 @@ interface Story {
   title: string;
   description: string;
   module: string;
-  priority: '高' | '中' | '低';
-  sourceReference: string;
-  confidence: number;
+  priority: Priority;
+  sourceReference: any; // 接受字符串或 SourceReference 对象
+  confidence: any; // 接受数字或 ConfidenceScore 对象
+  storyPoints?: number;
+  dependencies?: string[];
+  sprint?: number;
+  release?: string;
+  documentId?: string;
+  role?: string;
+  action?: string;
+  value?: string;
+  status?: StoryStatus;
+  isEdited?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  sortOrder?: number;
 }
 
 interface StoryCardProps {
@@ -56,9 +69,10 @@ export function StoryCard({ story, onUpdate, onDelete }: StoryCardProps) {
     }
   };
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.9) return 'text-green-600';
-    if (confidence >= 0.8) return 'text-yellow-600';
+  const getConfidenceColor = (confidence: any) => {
+    const confidenceValue = typeof confidence === 'number' ? confidence : confidence.overall || 0;
+    if (confidenceValue >= 0.9) return 'text-green-600';
+    if (confidenceValue >= 0.8) return 'text-yellow-600';
     return 'text-orange-600';
   };
 
@@ -84,8 +98,10 @@ export function StoryCard({ story, onUpdate, onDelete }: StoryCardProps) {
               {story.module}
             </Badge>
             <Badge variant="outline" className={getConfidenceColor(story.confidence)}>
-              置信度: {(story.confidence * 100).toFixed(0)}%
-            </Badge>
+                置信度: {typeof story.confidence === 'number' 
+                  ? (story.confidence * 100).toFixed(0) 
+                  : (story.confidence?.overall || 0) * 100}%
+              </Badge>
           </div>
         </div>
         <div className="flex gap-2 ml-4">
@@ -150,7 +166,11 @@ export function StoryCard({ story, onUpdate, onDelete }: StoryCardProps) {
             <FileText className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
               <p className="text-xs font-medium text-blue-900 mb-1">原文引用</p>
-              <p className="text-xs text-blue-700 leading-relaxed">{story.sourceReference}</p>
+              <p className="text-xs text-blue-700 leading-relaxed">
+              {typeof story.sourceReference === 'string' 
+                ? story.sourceReference 
+                : story.sourceReference?.text || '无引用'}
+            </p>
             </div>
           </div>
         </div>

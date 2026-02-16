@@ -27,7 +27,7 @@ export function FigmaAudit() {
   const [auditComplete, setAuditComplete] = useState(false);
   const [issues, setIssues] = useState<AuditIssue[]>([]);
 
-  const mockAudit = async () => {
+const mockAudit = async () => {
     setIsAuditing(true);
     setAuditProgress(0);
 
@@ -61,7 +61,7 @@ export function FigmaAudit() {
         id: '2',
         type: 'redundant',
         severity: 'medium',
-        prdReference: undefined,
+        prdReference: '',
         figmaFrame: 'Dashboard / Settings Panel',
         description: 'Figma 中存在"高级设置"面板，但 PRD 中未提及此功能需求',
         confidence: 0.88,
@@ -70,7 +70,7 @@ export function FigmaAudit() {
         id: '3',
         type: 'inconsistent',
         severity: 'high',
-        prdReference: 'PRD 2.4 节 - 搜索功能',
+        prdReference: 'PRD 3.3 节 - 搜索功能',
         figmaFrame: 'Home / Search Bar',
         description: 'PRD 描述"搜索框位于页面顶部右侧"，但 Figma 设计稿中搜索框在左侧导航栏',
         confidence: 0.95,
@@ -79,7 +79,7 @@ export function FigmaAudit() {
         id: '4',
         type: 'missing',
         severity: 'medium',
-        prdReference: 'PRD 3.3 节 - 非功能需求',
+        prdReference: 'PRD 4.1 节 - 加载状态',
         figmaFrame: undefined,
         description: 'PRD 提到的"加载状态骨架屏"在 Figma 设计中缺失',
         confidence: 0.85,
@@ -88,19 +88,10 @@ export function FigmaAudit() {
         id: '5',
         type: 'inconsistent',
         severity: 'low',
-        prdReference: 'PRD 4.2 节 - 按钮样式',
+        prdReference: 'PRD 2.4 节 - 按钮样式',
         figmaFrame: 'Components / Primary Button',
         description: 'PRD 要求主按钮为蓝色，Figma 设计稿使用了紫色',
         confidence: 0.78,
-      },
-      {
-        id: '6',
-        type: 'missing',
-        severity: 'high',
-        prdReference: 'PRD 2.1 节 - 文件上传',
-        figmaFrame: undefined,
-        description: '文件上传的进度条 UI 在 Figma 中未找到',
-        confidence: 0.90,
       },
     ];
 

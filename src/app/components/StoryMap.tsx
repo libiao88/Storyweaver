@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 
-interface Story {
+// 内部接口定义，用于 StoryMap 组件
+interface StoryMapStory {
   id: string;
   title: string;
   description: string;
@@ -25,10 +26,10 @@ interface Story {
 }
 
 interface StoryMapProps {
-  stories: Story[];
+  stories: any[];
 }
 
-function SortableStoryItem({ story }: { story: Story }) {
+function SortableStoryItem({ story }: { story: StoryMapStory }) {
   const {
     attributes,
     listeners,
@@ -82,7 +83,7 @@ function SortableStoryItem({ story }: { story: Story }) {
               </div>
             </div>
             <p className="text-sm text-gray-600 line-clamp-2">{story.description}</p>
-            {story.dependencies.length > 0 && (
+            {story.dependencies && story.dependencies.length > 0 && (
               <div className="mt-2">
                 <span className="text-xs text-gray-500">
                   依赖: {story.dependencies.join(', ')}
@@ -97,7 +98,7 @@ function SortableStoryItem({ story }: { story: Story }) {
 }
 
 export function StoryMap({ stories: initialStories }: StoryMapProps) {
-  const [stories, setStories] = useState<Story[]>(
+  const [stories, setStories] = useState<StoryMapStory[]>(
     initialStories.map((story, index) => ({
       ...story,
       storyPoints: Math.ceil(Math.random() * 8) + 1,
