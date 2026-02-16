@@ -45,9 +45,9 @@ export default function App() {
   }, [llmConfig]);
 
   // 测试LLM连接
-  const handleTestConnection = async () => {
+  const handleTestConnection = async (): Promise<boolean> => {
     if (!llmConfig.apiKey.trim()) {
-      return false;
+      throw new Error('请输入API Key');
     }
 
     setIsTesting(true);
@@ -56,16 +56,31 @@ export default function App() {
       const { LLMServiceFactory } = await import('@/services/LLMOptimizer');
       const service = LLMServiceFactory.createService(llmConfig);
       
-      // 发送简单测试请求
-      const testPrompt = '请回复"连接成功"';
+      const testPrompt = 'Hi';
       const response = await service.callAPI(testPrompt);
       
       setIsTesting(false);
-      return response.includes('连接成功');
-    } catch (error) {
+      
+      return !!(response && response.length > 0);
+    } catch (error: any) {
       setIsTesting(false);
       console.error('LLM connection test failed:', error);
-      return false;
+      
+      if (error.message?.includes('API_KEY_MISSING')) {
+        throw new Error('API Key 不能为空');
+      } else if (error.message?.includes('TIMEOUT')) {
+        throw new Error('连接超时，请检查网络或API地址');
+      } else if (error.message?.includes('RATE_LIMIT')) {
+        throw new Error('请求过于频繁，请稍后再试');
+      } else if (error.message?.includes('QUOTA_EXCEEDED')) {
+        throw new Error('API 配额已用完，请检查账户余额');
+      } else if (error.message?.includes('API_CALL_FAILED')) {
+        throw new Error('API 调用失败，请检查 API Key 是否正确');
+      } else if (error.message?.includes('fetch') || error.message?.includes('network')) {
+        throw new Error('网络错误，请检查网络连接或代理设置');
+      } else {
+        throw new Error(`连接失败: ${error.message || '未知错误'}`);
+      }
     }
   };
 

@@ -50,18 +50,37 @@ export function LLMConfigPanel({
     setTestResult('');
     setTestMessage('');
 
+    if (!apiKey.trim()) {
+      setTestResult('error');
+      setTestMessage('请输入 API Key');
+      return;
+    }
+
+    // 先保存当前配置到父组件
+    const currentConfig = {
+      ...config,
+      apiKey,
+      model,
+      temperature,
+      maxTokens,
+    };
+    onConfigChange(currentConfig);
+
+    // 短暂延迟确保配置已更新
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     try {
       const success = await onTestConnection();
       if (success) {
         setTestResult('success');
-        setTestMessage('连接成功');
+        setTestMessage('连接成功！API 配置正确');
       } else {
         setTestResult('error');
-        setTestMessage('连接失败');
+        setTestMessage('连接失败：无法验证 API 响应');
       }
     } catch (error) {
       setTestResult('error');
-      setTestMessage(error instanceof Error ? error.message : '连接失败');
+      setTestMessage(error instanceof Error ? error.message : '连接失败：未知错误');
     }
   };
 
