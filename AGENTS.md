@@ -1,169 +1,160 @@
 # AGENTS.md - Storyweaver Development Guide
 
-## Build & Development Commands
+## Build Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
+npm install    # Install dependencies
+npm run dev    # Start dev server (http://localhost:5173)
+npm run build  # Build for production
+npm run preview # Preview production build
 ```
 
-> **Note:** No test framework is currently configured. Do not add tests unless explicitly requested.
+> **Note:** No test framework configured. Do not add tests unless explicitly requested.
 
 ## Project Structure
 
 ```
 src/
-├── main.tsx                 # App entry point (React 18 createRoot)
-├── styles/                  # Global styles (index.css, theme.css, fonts.css)
+├── main.tsx              # App entry (React 18)
+├── types/storyweaver.ts  # Core interfaces
+├── styles/               # Global CSS
 └── app/
-    ├── App.tsx              # Root component (default export)
+    ├── App.tsx           # Root component
     └── components/
-        ├── figma/           # Figma-related components
-        ├── ui/              # Reusable UI components (Radix-based, named exports)
-        ├── APIGenerator.tsx
-        ├── FigmaAudit.tsx
-        ├── FileUpload.tsx
-        ├── StoryCard.tsx
-        ├── StoryList.tsx
-        └── StoryMap.tsx
+        ├── ui/           # Reusable UI components
+        └── [features]/   # Feature components
 ```
-
-## Path Aliases
-
-- `@/` resolves to `src/`
-
-Example: `import Button from "@/app/components/ui/button"`
 
 ## Tech Stack
 
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite 6 with @tailwindcss/vite plugin
-- **Styling**: Tailwind CSS v4 (no PostCSS config needed)
-- **UI Library**: Radix UI primitives + custom shadcn/ui-style components
+- **Framework**: React 18 + TypeScript
+- **Build**: Vite 6 + @tailwindcss/vite
+- **Styling**: Tailwind CSS v4
+- **UI**: Radix UI primitives + shadcn/ui-style
 - **Icons**: lucide-react
 - **Animation**: motion (Framer Motion)
-- **Forms**: react-hook-form
 
-## Code Style Guidelines
+## Path Aliases
+
+- `@/` → `src/`
+- Example: `import { Button } from "@/app/components/ui/button"`
+
+## Code Style
 
 ### TypeScript
-
-- Use explicit interfaces for props and data types
-- Prefer `type` for union types, `interface` for object shapes
-- Always type function parameters and return values
-- No tsconfig.json required (Vite handles TypeScript)
+- Use explicit interfaces for props
+- Prefer `type` for unions, `interface` for objects
+- Always type function params and returns
+- **No `any` types**
 
 ```typescript
-// Good
-interface Story {
-  id: string;
-  title: string;
-  description: string;
-}
+// ✅ Good
+interface Story { id: string; title: string; }
+function StoryCard({ story }: { story: Story }) { ... }
 
-function StoryCard({ story }: StoryCardProps) { ... }
-
-// Avoid - implicit any
-function handleClick(e) { ... }
+// ❌ Avoid
+function handleClick(e) { ... }  // implicit any
 ```
 
-### Component Patterns
-
-- **UI Components**: Use named exports (e.g., `export { Button }`)
-- **Page/Feature Components**: Use default exports for top-level components (e.g., `export default function App()`)
-- Export component function as named function (PascalCase)
-- Use `React.ComponentProps<"element">` for native HTML props
+### Components
+- **UI Components**: Named exports (`export { Button }`)
+- **Feature Components**: Default exports (`export default function App()`)
+- Use `React.ComponentProps<"element">` for HTML props
+- Add `data-slot` attributes
 
 ```typescript
-// UI Component - named export
+// UI - named export
 function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("rounded-lg", className)} {...props} />;
+  return <div className={cn("rounded-lg", className)} {...props} data-slot="card" />;
 }
 export { Card };
 
-// App/Page Component - default export
-export default function App() { ... }
+// Feature - default export
+export default function FileUpload() { ... }
 ```
-
-### Styling
-
-- Use Tailwind CSS utility classes
-- Use `cn()` utility (from `ui/utils.ts`) for conditional class merging
-- Use `class-variance-authority` (cva) for component variants
-
-```typescript
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "./utils";
-
-const buttonVariants = cva("inline-flex items-center justify-center...", {
-  variants: {
-    variant: { default: "...", destructive: "..." },
-    size: { default: "...", sm: "...", lg: "..." },
-  },
-  defaultVariants: { variant: "default", size: "default" },
-});
-```
-
-### Naming Conventions
-
-- Components: PascalCase (e.g., `StoryCard.tsx`, `FileUpload.tsx`)
-- Hooks: camelCase starting with `use` (e.g., `useState`, `useStoryData`)
-- Utils/Constants: camelCase or kebab-case
-- CSS classes: Tailwind utility classes
 
 ### Import Order
 
-1. External libraries (React, Radix UI, etc.)
-2. Internal imports (@/ path aliases)
-3. Relative imports (./, ../)
+1. External libraries (React, Radix, etc.)
+2. Internal imports (`@/` aliases)
+3. Relative imports (`./`, `../`)
+4. Type imports last
 
 ```typescript
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import { Edit2, Trash2 } from "lucide-react";
-import { cn } from "./utils";
+import { Edit2 } from "lucide-react";
+import { cn } from "@/app/components/ui/utils";
+import { Story } from "@/types/storyweaver";
+```
+
+### Naming
+
+- **Components**: PascalCase (`StoryCard.tsx`)
+- **Hooks**: camelCase with `use` prefix (`useStoryData`)
+- **Utils**: camelCase (`cn`, `formatDate`)
+- **Types**: PascalCase (`Story`, `UserProfile`)
+
+### Styling
+
+- Use Tailwind utilities exclusively
+- Use `cn()` from `ui/utils.ts` for class merging
+- Use `cva` for component variants
+- Theme vars in `src/styles/theme.css`
+
+```typescript
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md",
+  {
+    variants: {
+      variant: { 
+        default: "bg-primary text-primary-foreground",
+        destructive: "bg-destructive text-destructive-foreground"
+      },
+    },
+    defaultVariants: { variant: "default" },
+  }
+);
 ```
 
 ### Error Handling
 
-- Use try/catch for async operations
-- Display user-friendly error messages via UI components
-- Log errors appropriately for debugging
+```typescript
+try {
+  const result = await parseDocument(file);
+  setStories(result);
+} catch (error) {
+  console.error("Failed to parse:", error);
+  toast.error("文档解析失败，请检查文件格式");
+}
+```
 
-### Data Attributes
+### State
 
-- Use `data-slot` attributes for component identification (Radix pattern)
-- Example: `data-slot="button"`, `data-slot="card"`
+- Use React hooks (useState, useEffect)
+- Use localStorage for persistence
+- Prefer composition over prop drilling
 
-### Tailwind CSS v4
+## Adding Components
 
-- Uses `@tailwindcss/vite` plugin
-- No separate PostCSS config needed for basic setup
-- Use CSS variables for theming via Tailwind's native support
-- Theme variables defined in `src/styles/theme.css`
-
-### UI Component Library
-
-This project uses Radix UI primitives wrapped with custom styling. When adding new components:
-
-1. Find the appropriate Radix UI primitive (radix-ui.com)
-2. Create component in `src/app/components/ui/`
+1. Find Radix UI primitive (radix-ui.com)
+2. Create in `src/app/components/ui/`
 3. Use `cn()` for class merging
-4. Export named component and any variants
-5. Follow the existing pattern in `button.tsx`, `card.tsx` as reference
-6. Add `data-slot` attribute for component identification
+4. Export named component
+5. Add `data-slot` attribute
+6. Follow patterns in `button.tsx`, `card.tsx`
 
-### File Organization
+## File Organization
 
-- One component per file (or related small components in one file)
-- Colocate related types when possible
-- Keep UI components in `components/ui/`
-- Keep feature components in `components/`
-- Keep styles in `src/styles/`
+- One component per file
+- UI components in `components/ui/`
+- Feature components in `components/`
+- Hooks in `hooks/`
+- Utils in `lib/` or `utils/`
+
+## Environment Variables
+
+- `.env` for local dev
+- `.env.example` as template
+- Access: `import.meta.env.VITE_*`
+- Never commit secrets
