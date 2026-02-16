@@ -1,0 +1,11 @@
+{
+  "title": "StoryWeaver AI",
+  "emoji": "🚀",
+  "colorFrom": "blue",
+  "colorTo": "purple",
+  "sdk": "static",
+  "app_port": 5174,
+  "website": "https://github.com/libiao88/Storyweaver",
+  "tags": ["react", "typescript", "vite", "llm", "storyweaver"],
+  "license": "mit"
+}
