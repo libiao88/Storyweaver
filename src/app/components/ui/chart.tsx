@@ -113,7 +113,6 @@ function ChartTooltipContent({
   hideIndicator = false,
   label,
   labelFormatter,
-  labelClassName,
   formatter,
   color,
   nameKey,
@@ -143,8 +142,8 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn("font-medium", labelClassName)}>
-          {labelFormatter(value, payload)}
+        <div className="font-medium">
+          {labelFormatter(value as string | number)}
         </div>
       );
     }
@@ -153,13 +152,12 @@ function ChartTooltipContent({
       return null;
     }
 
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+    return <div className="font-medium">{value}</div>;
   }, [
     label,
     labelFormatter,
     payload,
     hideLabel,
-    labelClassName,
     config,
     labelKey,
   ]);
@@ -186,14 +184,14 @@ function ChartTooltipContent({
 
           return (
             <div
-              key={item.dataKey}
+              key={index}
               className={cn(
                 "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                 indicator === "dot" && "items-center",
               )}
             >
               {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
+                formatter(item.value as string | number, item.name, item, index)
               ) : (
                 <>
                   {itemConfig?.icon ? (
@@ -276,7 +274,7 @@ function ChartLegendContent({
       )}
     >
       {payload.map((item) => {
-        const key = `${nameKey || item.dataKey || "value"}`;
+        const key = `${nameKey || "value"}`;
         const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
         return (
