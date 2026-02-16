@@ -40,3 +40,9 @@ dist-ssr
 
 # Package manager files
 package-lock.json
+
+# Supabase
+supabase/supabase/
+
+# Hugging Face
+.huggingface/

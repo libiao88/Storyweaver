@@ -1,0 +1,121 @@
+StoryWeaver AI 项目目录结构
+==============================
+
+📦 storyweaver/
+│
+├── 📄 项目配置文件（根目录）
+│   ├── package.json              # 项目依赖和脚本
+│   ├── tsconfig.json             # TypeScript配置
+│   ├── vite.config.ts            # Vite构建配置
+│   ├── postcss.config.mjs        # PostCSS配置
+│   ├── index.html                # 应用入口HTML
+│   ├── .env                      # 环境变量（敏感）
+│   ├── .env.example              # 环境变量模板
+│   ├── .gitignore                # Git忽略规则
+│   └── README.md                 # 项目说明
+│
+├── 📁 src/                       # 源代码目录
+│   ├── main.tsx                  # 应用入口
+│   │
+│   ├── 📁 app/                   # 主应用
+│   │   ├── App.tsx               # 根组件
+│   │   └── 📁 components/        # 组件目录
+│   │       ├── 📁 ui/            # UI组件库(50+组件)
+│   │       ├── 📁 figma/         # Figma组件
+│   │       ├── APIGenerator.tsx  # API生成器
+│   │       ├── FigmaAudit.tsx    # Figma审计
+│   │       ├── FileUpload.tsx    # 文件上传
+│   │       ├── LLMConfigPanel.tsx# LLM配置面板
+│   │       ├── StoryCard.tsx     # 故事卡片
+│   │       ├── StoryList.tsx     # 故事列表
+│   │       └── StoryMap.tsx      # 故事地图
+│   │
+│   ├── 📁 services/              # 服务层
+│   │   ├── DocumentParser.ts     # 文档解析
+│   │   ├── ExportService.ts      # 导出服务
+│   │   ├── LLMOptimizer.ts       # LLM优化器
+│   │   ├── LLMService.ts         # LLM服务接口
+│   │   ├── SessionManager.ts     # 会话管理
+│   │   ├── StoryGenerator.ts     # 故事生成器
+│   │   └── supabase.ts           # Supabase客户端
+│   │
+│   ├── 📁 styles/                # 样式文件
+│   │   ├── fonts.css             # 字体样式
+│   │   ├── index.css             # 全局样式
+│   │   ├── tailwind.css          # Tailwind样式
+│   │   └── theme.css             # 主题样式
+│   │
+│   ├── 📁 types/                 # 类型定义
+│   │   └── storyweaver.ts        # 核心类型
+│   │
+│   └── vite-env.d.ts             # Vite环境类型
+│
+├── 📁 prd/                       # 产品需求文档(12个)
+│   ├── PRD_StoryWeaver.md        # 主PRD
+│   ├── PRD_StoryWeaver_Phase2.md # 第二阶段
+│   ├── PRD_StoryWeaver_Unified.md# 统一PRD
+│   ├── Gap_Analysis_Report.md    # 差距分析
+│   ├── Data_Model_Specification.md# 数据模型
+│   ├── API_Specification.md      # API规范
+│   ├── Storage_Strategy.md       # 存储策略
+│   ├── Backend_Architecture_Decision.md # 架构决策
+│   ├── Error_Handling_Specification.md  # 错误处理
+│   ├── AI_Algorithm_Strategy.md  # AI算法
+│   ├── Authentication_Authorization_Design.md # 认证授权
+│   └── Testing_Strategy.md       # 测试策略
+│
+├── 📁 supabase/                  # Supabase配置
+│   ├── init.sql                  # 数据库初始化
+│   └── 📁 supabase/              # CLI配置
+│       ├── config.toml
+│       └── .gitignore
+│
+├── 📁 .huggingface/              # Hugging Face配置
+│   └── metadata.json             # Space元数据
+│
+├── 📁 guidelines/                # 项目规范
+│   └── Guidelines.md
+│
+├── 📁 dist/                      # 构建输出（自动生成）
+│   ├── index.html
+│   └── 📁 assets/
+│       ├── index-CtDqi3oP.css
+│       └── index-DKZF7NsC.js
+│
+└── 📁 node_modules/              # 依赖目录（自动生成）
+
+📄 部署相关文件（根目录）
+├── deploy.sh                     # 主部署脚本
+├── validate-deployment.sh        # 部署验证
+├── fix-hf-sdk.sh                 # SDK修复脚本
+├── DEPLOYMENT.md                 # 部署说明
+├── DEPLOYMENT_EXECUTION_PLAN.md  # 执行计划
+├── DEPLOYMENT_STATUS.md          # 状态分析
+├── HUGGINGFACE_DEPLOYMENT.md     # HF部署指南
+├── FIND_CONFIG_GUIDE.md          # 配置查找
+├── BACKUP_MANUAL_FIX.md          # 手动修复
+├── QUICK_FIX.md                  # 快速修复
+├── QUICK_FIX_FINAL.md            # 快速修复最终版
+└── hf-readme-config.md           # HF README配置
+
+📄 测试文件（根目录）
+├── TEST_PLAN.md                  # 测试计划
+├── TEST_REPORT.md                # 测试报告
+├── test-document.md              # 测试文档
+├── test-llm-services.js          # LLM测试(Node)
+├── test-llm-services.mjs         # LLM测试(ESM)
+├── test-project.sh               # 项目测试
+└── test-volcano-api-key.mjs      # 火山API测试
+
+📄 架构文档（根目录）
+├── LLM_INTEGRATION_ARCHITECTURE.md # LLM架构
+└── AGENTS.md                     # 代理配置
+
+==============================
+文件统计：
+- 配置文件: 9个
+- 源代码: ~60个
+- 文档: ~25个
+- 脚本: 4个
+- 测试: 4个
+==============================

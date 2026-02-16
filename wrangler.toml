@@ -1,0 +1,12 @@
+{
+  "name": "storyweaver-ai",
+  "version": "1.0.0",
+  "build_output_directory": "dist",
+  "build_command": "npm run build",
+  "routes": [
+    {
+      "src": "/[^.]+",
+      "dest": "/index.html"
+    }
+  ]
+}
