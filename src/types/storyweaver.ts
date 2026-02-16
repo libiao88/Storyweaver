@@ -135,6 +135,9 @@ export interface Story {
   createdAt: Date;
   updatedAt: Date;
   sortOrder: number;
+  dependencies: string[];
+  sprint?: number;
+  release?: string;
 }
 
 // 解析的文档
