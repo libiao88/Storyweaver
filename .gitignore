@@ -37,3 +37,6 @@ dist-ssr
 # Temporary files
 *.tmp
 *.temp
+
+# Package manager files
+package-lock.json
