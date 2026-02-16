@@ -1,20 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileUpload } from '@/app/components/FileUpload';
 import { StoryList } from '@/app/components/StoryList';
 import { StoryMap } from '@/app/components/StoryMap';
 import { FigmaAudit } from '@/app/components/FigmaAudit';
 import { APIGenerator } from '@/app/components/APIGenerator';
+import { LLMConfigPanel } from '@/app/components/LLMConfigPanel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import { Card } from '@/app/components/ui/card';
-import { Sparkles, FileText, BarChart3, Upload, Map, Search, Code2 } from 'lucide-react';
+import { Sparkles, FileText, BarChart3, Upload, Map, Search, Code2, Settings } from 'lucide-react';
 import { Toaster } from '@/app/components/ui/sonner';
+
+import { Priority, StoryStatus } from '@/types/storyweaver';
+import { LLMConfig, LLMModel } from '@/services/LLMService';
 
 interface Story {
   id: string;
   title: string;
   description: string;
   module: string;
-  priority: string;
+  priority: '高' | '中' | '低';
   sourceReference: string;
   confidence: number;
 }
@@ -22,6 +26,57 @@ interface Story {
 export default function App() {
   const [stories, setStories] = useState<Story[]>([]);
   const [activeTab, setActiveTab] = useState('upload');
+  const [llmConfig, setLLMConfig] = useState<LLMConfig>({
+    model: LLMModel.GPT4oMini,
+    apiKey: '',
+    temperature: 0.3,
+    maxTokens: 2000,
+    requestTimeout: 30000,
+  });
+  const [isTesting, setIsTesting] = useState(false);
+
+  // 从localStorage加载配置
+  useEffect(() => {
+    const savedConfig = localStorage.getItem('llm-config');
+    if (savedConfig) {
+      try {
+        const parsed = JSON.parse(savedConfig);
+        setLLMConfig({ ...llmConfig, ...parsed });
+      } catch (error) {
+        console.error('Failed to parse LLM config:', error);
+      }
+    }
+  }, []);
+
+  // 保存配置到localStorage
+  useEffect(() => {
+    localStorage.setItem('llm-config', JSON.stringify(llmConfig));
+  }, [llmConfig]);
+
+  // 测试LLM连接
+  const handleTestConnection = async () => {
+    if (!llmConfig.apiKey.trim()) {
+      return false;
+    }
+
+    setIsTesting(true);
+
+    try {
+      const { LLMServiceFactory } = await import('@/services/LLMOptimizer');
+      const service = LLMServiceFactory.createService(llmConfig);
+      
+      // 发送简单测试请求
+      const testPrompt = '请回复"连接成功"';
+      const response = await service.callAPI(testPrompt);
+      
+      setIsTesting(false);
+      return response.includes('连接成功');
+    } catch (error) {
+      setIsTesting(false);
+      console.error('LLM connection test failed:', error);
+      return false;
+    }
+  };
 
   const handleFileProcessed = (newStories: Story[]) => {
     setStories(newStories);
@@ -94,7 +149,7 @@ export default function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-6">
+          <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-7">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               上传
@@ -119,6 +174,10 @@ export default function App() {
               <BarChart3 className="h-4 w-4" />
               分析
             </TabsTrigger>
+            <TabsTrigger value="config" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              配置
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload" className="space-y-6">
@@ -130,7 +189,10 @@ export default function App() {
               </p>
             </div>
             
-            <FileUpload onFileProcessed={handleFileProcessed} />
+            <FileUpload 
+              onFileProcessed={handleFileProcessed} 
+              llmConfig={llmConfig}
+            />
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               <Card className="p-6 text-center border-2 hover:border-blue-200 transition-colors">
@@ -178,6 +240,15 @@ export default function App() {
 
           <TabsContent value="api">
             <APIGenerator />
+          </TabsContent>
+
+          <TabsContent value="config">
+            <LLMConfigPanel
+              config={llmConfig}
+              onConfigChange={setLLMConfig}
+              onTestConnection={handleTestConnection}
+              isTesting={isTesting}
+            />
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">

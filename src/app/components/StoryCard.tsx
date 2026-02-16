@@ -6,12 +6,14 @@ import { Textarea } from '@/app/components/ui/textarea';
 import { Input } from '@/app/components/ui/input';
 import { Edit2, Trash2, Save, X, FileText } from 'lucide-react';
 
+import { Priority, StoryStatus } from '@/types/storyweaver';
+
 interface Story {
   id: string;
   title: string;
   description: string;
   module: string;
-  priority: string;
+  priority: '高' | '中' | '低';
   sourceReference: string;
   confidence: number;
 }

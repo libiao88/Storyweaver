@@ -2,12 +2,16 @@ import { Upload, FileText, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Progress } from '@/app/components/ui/progress';
+import { DocumentParser } from '@/services/DocumentParser';
+import { Priority } from '@/types/storyweaver';
+import { LLMConfig } from '@/services/LLMService';
 
 interface FileUploadProps {
   onFileProcessed: (stories: any[]) => void;
+  llmConfig?: LLMConfig;
 }
 
-export function FileUpload({ onFileProcessed }: FileUploadProps) {
+export function FileUpload({ onFileProcessed, llmConfig }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -51,68 +55,31 @@ export function FileUpload({ onFileProcessed }: FileUploadProps) {
     }
 
     setUploadStatus('processing');
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Generate mock user stories
-    const mockStories = [
-      {
-        id: '1',
-        title: '用户登录功能',
-        description: 'As a 普通用户, I want to 使用账号密码登录系统, So that 我可以访问个人化的功能和数据',
-        module: '用户管理',
-        priority: '高',
-        sourceReference: '需求文档第3.1节：用户应能够通过邮箱和密码登录系统...',
-        confidence: 0.95
-      },
-      {
-        id: '2',
-        title: '文档上传接口',
-        description: 'As a 产品经理, I want to 上传PRD文档到系统, So that 系统可以自动解析并生成用户故事',
-        module: '文档处理',
-        priority: '高',
-        sourceReference: '需求文档第2.1节：系统必须支持.docx, .pdf, .txt格式...',
-        confidence: 0.92
-      },
-      {
-        id: '3',
-        title: '用户故事展示面板',
-        description: 'As a 技术负责人, I want to 在面板中查看所有生成的用户故事, So that 我可以快速评估需求范围',
-        module: '展示模块',
-        priority: '中',
-        sourceReference: '需求文档第2.4节：采用卡片式或列表式布局展示...',
-        confidence: 0.88
-      },
-      {
-        id: '4',
-        title: '故事编辑功能',
-        description: 'As a 敏捷教练, I want to 编辑和修改生成的用户故事, So that 我可以调整描述以符合团队标准',
-        module: '交互功能',
-        priority: '中',
-        sourceReference: '需求文档第2.4节：允许用户手动修改生成的故事...',
-        confidence: 0.90
-      },
-      {
-        id: '5',
-        title: 'CSV格式导出',
-        description: 'As a 产品经理, I want to 将用户故事导出为CSV文件, So that 我可以导入到Jira或Excel中',
-        module: '导出功能',
-        priority: '中',
-        sourceReference: '需求文档第2.4节：支持CSV导出，包含Title, Description...',
-        confidence: 0.93
-      },
-      {
-        id: '6',
-        title: '非功能需求识别',
-        description: 'As a 技术负责人, I want to 系统自动识别性能和安全相关需求, So that 这些关键需求不会被遗漏',
-        module: '解析引擎',
-        priority: '低',
-        sourceReference: '需求文档第3节：非功能性需求包括性能、安全性...',
-        confidence: 0.75
-      }
-    ];
+    // Parse file using DocumentParser
+    const parser = new DocumentParser(llmConfig);
+    const parsedDoc = await parser.parseFile(file);
+
+    if (parsedDoc.status === 'failed') {
+      setUploadStatus('error');
+      setErrorMessage(parsedDoc.errorMessage || '文档解析失败');
+      return;
+    }
+
+    // Convert parsed stories to the format expected by the app
+    const formattedStories = (parsedDoc.stories || []).map(story => ({
+      id: story.id,
+      title: story.title,
+      description: story.description,
+      module: story.module,
+      priority: story.priority === Priority.P0 ? '高' : story.priority === Priority.P1 ? '中' : '低',
+      sourceReference: story.sourceReference.text,
+      confidence: story.confidence.overall
+    }));
 
     setUploadStatus('success');
-    onFileProcessed(mockStories);
+    onFileProcessed(formattedStories);
   };
 
   const handleFile = async (file: File) => {

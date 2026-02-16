@@ -14,11 +14,14 @@ interface Story {
   id: string;
   title: string;
   description: string;
-  priority: string;
+  priority: '高' | '中' | '低';
   storyPoints: number;
   dependencies: string[];
   sprint?: number;
   release?: string;
+  module?: string;
+  sourceReference?: string;
+  confidence?: number;
 }
 
 interface StoryMapProps {

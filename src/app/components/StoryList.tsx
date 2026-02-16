@@ -9,12 +9,14 @@ import { Textarea } from '@/app/components/ui/textarea';
 import { Label } from '@/app/components/ui/label';
 import { toast } from 'sonner';
 
+import { Priority, StoryStatus } from '@/types/storyweaver';
+
 interface Story {
   id: string;
   title: string;
   description: string;
   module: string;
-  priority: string;
+  priority: '高' | '中' | '低';
   sourceReference: string;
   confidence: number;
 }
